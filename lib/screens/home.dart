@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:job_prep/widget/horizontal_oneline_slidable_list.dart';
-import 'package:job_prep/widget/search.dart';
+
+import '../models/problem.dart';
+import '../widget/horizontal_oneline_slidable_list.dart';
+import '../widget/search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,6 +24,7 @@ class _HomePageState extends State<HomePage> {
     {'name': 'SpaceX'},
   ];
   Map<String, dynamic>? currentItem = {'name': 'Google'};
+  List<Problem> problems = [];
 
   void changeItem(Map<String, dynamic> item) {
     setState(() {
@@ -31,9 +34,30 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Problem> showProblems;
+    if (currentItem != null) {
+      showProblems = problems
+          .where((problem) =>
+              problem.companies?.contains(currentItem!['name']) ?? false)
+          .toList();
+    } else {
+      showProblems = problems;
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              problems = await problemsFromHttp();
+              for (var problem in problems) {
+                saveProblemToDB(problem);
+              }
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -46,25 +70,51 @@ class _HomePageState extends State<HomePage> {
             currentItem: currentItem,
           ),
           const SizedBox(height: 10),
-          MaterialButton(
-            onPressed: () {},
-            color: Colors.black,
-            shape: const StadiumBorder(),
-            child: Text(
-              'Showing problems for ${currentItem != null ? currentItem!['name'] : 'All companies'}',
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.white,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              MaterialButton(
+                onPressed: () {},
+                color: Colors.black,
+                shape: const StadiumBorder(),
+                child: Text(
+                  'Showing problems for ${currentItem != null ? currentItem!['name'] : 'All'}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
+              IconButton(onPressed: () {
+                setState(() {
+                  currentItem = null;
+                });
+              }, icon: const Icon(Icons.clear)),
+            ],
           ),
           Expanded(
             child: ListView.builder(
-                itemCount: items.length,
+                itemCount: showProblems.length,
                 itemBuilder: (context, index) {
+                  Color color = Colors.white;
+                  if (showProblems[index].status == 'Solved') {
+                    color = Colors.blue;
+                  } else if (showProblems[index].status == 'Confident') {
+                    color = Colors.green;
+                  } else if (showProblems[index].status == 'Tried') {
+                    color = Colors.red;
+                  }
                   return Card(
                     child: ListTile(
-                      title: Text(items[index]['name']),
+                      tileColor: color,
+                      title: Text(showProblems[index].name),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(showProblems[index].acceptance.toString()),
+                          Text(showProblems[index].difficulty),
+                        ],
+                      ),
                     ),
                   );
                 }),
