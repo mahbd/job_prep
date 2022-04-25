@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../models/problem.dart';
+import '../screens/problem.dart';
 import '../screens/signup.dart';
 import '../constants.dart';
 import '../screens/login.dart';
@@ -21,6 +23,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (BuildContext context) => const RegisterPage(),
+      );
+    case NamedRoutes.problem:
+      Problem problem = settings.arguments as Problem;
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (BuildContext context) => ProblemPage(problem: problem),
       );
     default:
       return MaterialPageRoute<void>(

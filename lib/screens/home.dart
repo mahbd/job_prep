@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../constants.dart';
 import '../models/problem.dart';
 import '../widget/horizontal_oneline_slidable_list.dart';
 import '../widget/search.dart';
@@ -12,17 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> items = [
-    {'name': 'Google'},
-    {'name': 'Facebook'},
-    {'name': 'Apple'},
-    {'name': 'Microsoft'},
-    {'name': 'Amazon'},
-    {'name': 'Netflix'},
-    {'name': 'Uber'},
-    {'name': 'Tesla'},
-    {'name': 'SpaceX'},
-  ];
+  List<Map<String, dynamic>> items = companiesName.map((e) => {'name': e}).toList();
   Map<String, dynamic>? currentItem = {'name': 'Google'};
   List<Problem> problems = [];
 
@@ -57,6 +48,13 @@ class _HomePageState extends State<HomePage> {
               setState(() {});
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.storage),
+            onPressed: () async {
+              problems = await problemsFromDB();
+              setState(() {});
+            },
+          ),
         ],
       ),
       body: Column(
@@ -85,11 +83,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              IconButton(onPressed: () {
-                setState(() {
-                  currentItem = null;
-                });
-              }, icon: const Icon(Icons.clear)),
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      currentItem = null;
+                    });
+                  },
+                  icon: const Icon(Icons.clear)),
             ],
           ),
           Expanded(
@@ -106,6 +106,13 @@ class _HomePageState extends State<HomePage> {
                   }
                   return Card(
                     child: ListTile(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          NamedRoutes.problem,
+                          arguments: showProblems[index],
+                        );
+                      },
                       tileColor: color,
                       title: Text(showProblems[index].name),
                       subtitle: Row(

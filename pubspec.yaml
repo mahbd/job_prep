@@ -37,6 +37,7 @@ dependencies:
   shared_preferences: ^2.0.13
   http: ^0.13.4
   sembast: ^3.2.0
+  flutter_widget_from_html_core: ^0.8.5+1
 
 dev_dependencies:
   flutter_test:
