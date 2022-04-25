@@ -1,4 +1,5 @@
-const String api = "https://jp-prep.herokuapp.com/api";
+// const String api = "https://jp-prep.herokuapp.com/api";
+const String api = "http://10.0.2.2:8000/api";
 const String dbPath = "job_preparation.db";
 
 class DBName {

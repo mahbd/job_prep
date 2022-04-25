@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:job_prep/constants.dart';
 
+import '../widget/mac_text_field.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
@@ -46,161 +48,60 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                TextField(
+                MacTextField(
                   controller: _firstNameController,
-                  enabled: !_isLoading,
-                  keyboardType: TextInputType.name,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "First Name",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.person),
-                  ),
+                  isLoading: _isLoading,
+                  prefixIcon: const Icon(Icons.person),
+                  hintText: "First Name",
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                MacTextField(
                   controller: _emailController,
-                  enabled: !_isLoading,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "Email",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.email),
-                  ),
+                  isLoading: _isLoading,
+                  prefixIcon: const Icon(Icons.email),
+                  hintText: "Email",
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                MacTextField(
                   controller: _usernameController,
-                  enabled: !_isLoading,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "Username",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.person),
-                  ),
+                  isLoading: _isLoading,
+                  prefixIcon: const Icon(Icons.person),
+                  hintText: "Username",
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                MacTextField(
                   controller: _passwordController,
+                  isLoading: _isLoading,
+                  prefixIcon: const Icon(Icons.lock),
+                  hintText: "Password",
                   obscureText: _obscureText,
-                  enabled: !_isLoading,
-                  keyboardType: TextInputType.visiblePassword,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "Password",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                      child: Icon(
-                        _obscureText ? Icons.visibility : Icons.visibility_off,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                MacTextField(
                   controller: _confirmPasswordController,
+                  isLoading: _isLoading,
+                  prefixIcon: const Icon(Icons.lock),
+                  hintText: "Confirm Password",
                   obscureText: _obscureText,
-                  enabled: !_isLoading,
-                  keyboardType: TextInputType.visiblePassword,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "Confirm Password",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                      child: Icon(
-                        _obscureText ? Icons.visibility : Icons.visibility_off,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -241,7 +142,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushReplacementNamed(NamedRoutes.login);
+                        Navigator.of(context)
+                            .pushReplacementNamed(NamedRoutes.login);
                       },
                       child: const Text(
                         ' Login',

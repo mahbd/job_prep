@@ -1,4 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:job_prep/constants.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widget/mac_text_field.dart';
+import '../constants.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,6 +20,46 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscureText = true;
   bool _isLoading = false;
+
+  Future<bool> login(String username, String password) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$api/token/'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
+      );
+      if (res.statusCode == 200) {
+        final response = jsonDecode(res.body);
+        String access = response['access'];
+        String refresh = response['refresh'];
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('access', access);
+        prefs.setString('refresh', refresh);
+        return true;
+      } else {
+        if (res.statusCode == 401) {
+          setState(() {
+            errors = 'Invalid username or password';
+          });
+        } else {
+          setState(() {
+            errors = 'Error logging in(${res.statusCode})';
+          });
+        }
+      }
+    } catch (e) {
+      errors = 'Something went wrong';
+    }
+    return false;
+  }
+
+  String? errors;
 
   @override
   Widget build(BuildContext context) {
@@ -40,72 +88,34 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 // const Text('Username:', style: TextStyle(fontSize: 16)),
-                TextField(
+                MacTextField(
                   controller: _usernameController,
-                  enabled: !_isLoading,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "Username",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.person),
-                  ),
+                  isLoading: _isLoading,
+                  hintText: 'Username',
+                  prefixIcon: const Icon(Icons.person),
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                MacTextField(
                   controller: _passwordController,
+                  isLoading: _isLoading,
+                  hintText: 'Password',
+                  errorText: errors,
+                  prefixIcon: const Icon(Icons.lock),
                   obscureText: _obscureText,
-                  enabled: !_isLoading,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: "Password",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(
-                        width: 4,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                      child: Icon(
-                        _obscureText ? Icons.visibility : Icons.visibility_off,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 5),
                 MaterialButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_usernameController.text.isEmpty ||
                         _passwordController.text.isEmpty ||
                         _isLoading) {
@@ -114,6 +124,14 @@ class _LoginPageState extends State<LoginPage> {
                     setState(() {
                       _isLoading = true;
                     });
+                    bool response = await login(
+                        _usernameController.text, _passwordController.text);
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    if (response) {
+                      Navigator.pushReplacementNamed(context, NamedRoutes.home);
+                    }
                   },
                   child: _isLoading
                       ? const CircularProgressIndicator(
@@ -140,7 +158,10 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(fontSize: 16),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, NamedRoutes.forgotPassword);
+                      },
                       child: const Text(
                         ' Reset Now',
                         style: TextStyle(
@@ -161,7 +182,10 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(fontSize: 16),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushReplacementNamed(
+                            context, NamedRoutes.register);
+                      },
                       child: const Text(
                         ' Sign Up',
                         style: TextStyle(
